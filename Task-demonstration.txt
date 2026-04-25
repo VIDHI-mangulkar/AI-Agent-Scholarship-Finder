@@ -1,0 +1,140 @@
+Task Decomposition / Specification Document
+🎓 AI Scholarship & Fellowship Agent
+1️⃣ Objective
+
+The goal of this system is to design an AI-powered agent that takes a student profile (field of study, nationality, academic level) and automatically:
+Searches real-time scholarship data
+Extracts relevant opportunities
+Ranks them based on suitability
+Generates application guidance
+Evaluates output quality using an LLM judge
+The system follows an agentic AI architecture where multiple modules work sequentially.
+
+2️⃣ Input Specification
+The system takes the following inputs from the user:
+Input Field	Type	Description
+Field of Study	String	Academic discipline (e.g., MBA, ECE, CS)
+Nationality	String	Country of applicant
+Academic Level	String	UG / PG / PhD
+  
+3️⃣ Output Specification
+The system generates:
+List of relevant scholarships
+Structured scholarship details
+Ranked scholarship list
+Application tips
+Evaluation score (LLM Judge)
+  
+4️⃣ Task Decomposition (Core Pipeline)
+
+The system is divided into 5 main AI tasks:
+
+🔹 Task 1: Query Generation
+
+Module: Agent Core (LLM - LLaMA3)
+
+Function:
+Converts user profile into optimized search query
+Output:
+Search string for Tavily API
+Example:
+
+"MBA scholarships for Indian postgraduate students"
+
+🔹 Task 2: Web Search (Tavily Integration)
+
+Module: Tools Layer
+
+Function:
+Fetches real-time scholarship data from the web
+Tool Used:
+Tavily Search API
+Output:
+Raw web results (text + links)
+🔹 Task 3: Information Extraction
+
+Module: LLM (LLaMA3 via Ollama)
+
+Function:
+Extracts structured scholarship details from raw data
+Output Format:
+Scholarship Name
+Eligibility Criteria
+Deadline
+Benefits
+Application Link
+  
+🔹 Task 4: Ranking & Prioritization
+
+Module: LLM Reasoning Layer
+
+Function:
+Ranks scholarships based on:
+Relevance to profile
+Ease of eligibility
+Financial benefits
+Application feasibility
+Output:
+Ordered list of scholarships (best → worst)
+  
+🔹 Task 5: Application Guidance Generator
+
+Module: LLM (LLaMA3)
+
+Function:
+Generates personalized tips for applications
+Output:
+Strategy tips
+Common mistakes
+Success recommendations
+  
+🔹 Task 6: LLM-as-Judge Evaluation
+Module: Judge Agent
+Function:
+Evaluates final output quality
+Evaluation Criteria:
+Relevance
+Completeness
+Clarity
+Ranking quality
+Usefulness
+Output:
+Score (1–10)
+Feedback
+Improvement suggestions
+  
+5️⃣ Decision Points in System
+Stage	Decision
+Query Generation	What keywords best match profile
+Web Search	Which results are relevant
+Extraction	Which data is valid scholarship info
+Ranking	Which scholarship is most suitable
+Evaluation	Whether output meets quality threshold
+  
+6️⃣ Error Handling Strategy
+If Tavily fails → return cached or empty results message
+If LLM fails → fallback response from Ollama timeout handler
+If parsing fails → return raw LLM output
+If API slow → timeout (60 seconds max per request)
+7️⃣ Non-Functional Requirements
+  
+ Fast response (under 30 seconds)
+No paid API dependency (Ollama local model)
+Real-time data fetching (Tavily)
+Modular agent-based architecture
+Explainable outputs
+Technology Stack
+Component	Technology
+LLM	Ollama (LLaMA3)
+Web Search	Tavily API
+Backend	Python
+UI	Streamlit
+Evaluation	LLM-as-Judge
+Environment	VS Code + Virtual Env
+  
+Summary
+This system decomposes a complex real-world problem (scholarship discovery) into modular AI tasks, enabling:
+Autonomy
+Scalability
+Real-time decision making
+Self-evaluation
