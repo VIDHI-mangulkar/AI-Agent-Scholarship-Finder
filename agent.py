@@ -1,67 +1,81 @@
 from tools import search_scholarships
-from llm import generate_response
+from llm import call_llm
 
-def scholarship_agent(profile):
 
-    query = f"""
-    Find scholarships and fellowships for:
-    Field: {profile['field']}
-    Nationality: {profile['nationality']}
-    Level: {profile['level']}
-    """
-
-    results = search_scholarships(query)
-
-    # Clean noisy results
-    results = [r for r in results if r.get("content") and len(r["content"]) > 50]
-
-    context = ""
-    for r in results:
-        context += f"""
-Title: {r['title']}
-Content: {r['content']}
-URL: {r['url']}
----
+# 1. Build query
+def build_query(profile):
+    return f"""
+Find scholarships for:
+Field: {profile['field']}
+Nationality: {profile['nationality']}
+Academic Level: {profile['level']}
 """
 
+
+# 2. Extract scholarships
+def extract_scholarships(results):
     prompt = f"""
-You are a world-class scholarship AI advisor.
+Extract scholarships from this data:
 
-TASK:
-From the data below, select, rank, and explain best scholarships.
+{results}
 
-DATA:
-{context}
-
-STRICT OUTPUT FORMAT:
-
-## 🏆 Ranked Scholarships
-
-1. Scholarship Name
-   - Why it matches:
-   - Eligibility:
-   - Deadline:
-   - Benefit:
-
-2. Scholarship Name
-   - Why it matches:
-   - Eligibility:
-   - Deadline:
-   - Benefit:
-
-## 📌 Application Tips
-- Write 4 strong application tips
-
-## ⚡ Final Summary
-Give a short conclusion (2-3 lines)
-
-RULES:
-- MUST rank scholarships
-- MUST use bullets
-- MUST be structured
-- Focus on best global opportunities
+Return structured JSON:
+- name
+- eligibility
+- deadline
+- benefits
+- link
 """
+    return call_llm(prompt)
 
-    response = generate_response(prompt)
 
-    return response, results
+# 3. Rank scholarships
+def rank_scholarships(data):
+    prompt = f"""
+Rank these scholarships based on:
+- relevance
+- ease of eligibility
+- benefits
+
+Data:
+{data}
+
+Return ranked list with reasoning.
+"""
+    return call_llm(prompt)
+
+
+# 4. Generate tips
+def generate_tips(ranked):
+    prompt = f"""
+Give application tips:
+
+{ranked}
+
+Include:
+- strategy
+- mistakes to avoid
+- success tips
+"""
+    return call_llm(prompt)
+
+
+# 🔥 FULL PIPELINE
+def run_agent(profile):
+    query = build_query(profile)
+
+    search_results = search_scholarships(query)
+
+    extracted = extract_scholarships(search_results)
+
+    ranked = rank_scholarships(extracted)
+
+    tips = generate_tips(ranked)
+
+    return {
+        "query": query,
+        "search_results": search_results,
+        "extracted": extracted,
+        "ranked": ranked,
+        "tips": tips
+    }
