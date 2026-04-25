@@ -3,16 +3,9 @@
                    TOPIC: Scholarship Finder 
 Group Members:
 Role A (Architect and Integrator) - [Vidhi Mangulkar] [roll no-23]
+
 Role B (Builder and Deployer) - [Gayatri Naidu] [roll no-15]
 
-Git Hub: https://github.com/Gayatri-Naidu612/Scholarship-Finder-Agentic-AI.git
-https://github.com/VIDHI-mangulkar/AI-Agent-Scholarship-Finder.git
-
-Live Demo:
-
-Date:23/4/2026
-Semester IV[Btech ECE A]
- 
 
 PHASE 1 : PROBLEM STATEMENT 
 
@@ -66,7 +59,6 @@ The entire system is deployed as a Streamlit web application, allowing users to 
 Pain: overwhelmed by options, unsure what she qualifies for, no guidance on applications
 Needs: ranked shortlist + deadlines + specific tips she can act on immediately
 
-voom viedo : 
-app link : 
+ 
 
 
