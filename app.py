@@ -1,38 +1,50 @@
 import streamlit as st
-from agent import scholarship_agent
-from judge import evaluate_output
+from agent import run_agent
 
-st.set_page_config(page_title="Scholarship AI Agent", layout="centered")
+st.set_page_config(page_title="AI Scholarship Agent", layout="centered")
 
-st.title("🎓 AI Scholarship & Fellowship Agent")
+st.title("🎓 AI Scholarship & Fellowship Agent (Ollama + LLaMA3)")
 
-st.markdown("Enter student profile to get ranked scholarships with AI evaluation")
+st.write("Enter student profile to find ranked scholarships")
 
-field = st.text_input("Field of Study")
-nationality = st.text_input("Nationality")
+# Input fields
+field = st.text_input("Field of Study", value="MBA")
+nationality = st.text_input("Nationality", value="India")
 level = st.selectbox("Academic Level", ["Undergraduate", "Postgraduate", "PhD"])
 
-if st.button("Find Scholarships"):
+# Button
+if st.button("🔍 Find Scholarships"):
+    try:
+        # Show loading
+        with st.spinner("Running AI agent... please wait ⏳"):
+            
+            profile = {
+                "field": field,
+                "nationality": nationality,
+                "level": level
+            }
 
-    if not field or not nationality:
-        st.error("Please fill all fields")
-    else:
-        profile = {
-            "field": field,
-            "nationality": nationality,
-            "level": level
-        }
+            # Run agent
+            result = run_agent(profile)
 
-        with st.spinner("AI Agent is analyzing scholarships..."):
-            result, sources = scholarship_agent(profile)
+        st.success("Done!")
+
+        # OUTPUT SECTIONS
+        st.subheader("🔎 Search Query")
+        st.write(result.get("query", "No query generated"))
+
+        st.subheader("🌐 Search Results")
+        st.json(result.get("search_results", {}))
+
+        st.subheader("📌 Extracted Scholarships")
+        st.text(result.get("extracted", "No extracted data"))
 
         st.subheader("🏆 Ranked Scholarships")
-        st.markdown(result)
+        st.text(result.get("ranked", "No ranking data"))
 
-        st.subheader("📊 AI Judge Score")
-        score = evaluate_output(result)
-        st.markdown(score)
+        st.subheader("💡 Application Tips")
+        st.text(result.get("tips", "No tips generated"))
 
-        st.subheader("🔗 Sources")
-        for s in sources:
-            st.markdown(f"- [{s['title']}]({s['url']})")
+    except Exception as e:
+        st.error("❌ Something went wrong")
+        st.exception(e)
