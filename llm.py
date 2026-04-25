@@ -1,22 +1,18 @@
-import os
-import google.generativeai as genai
-from dotenv import load_dotenv
+import requests
 
-load_dotenv()
+def call_llm(prompt):
+    try:
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "llama3",
+                "prompt": prompt,
+                "stream": False
+            },
+            timeout=60   # 🔥 prevents infinite loading
+        )
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        return response.json().get("response", "No response")
 
-def get_model():
-    models = genai.list_models()
-
-    for m in models:
-        if "generateContent" in m.supported_generation_methods:
-            return m.name
-
-    return "models/gemini-pro"
-
-model = genai.GenerativeModel(get_model())
-
-def generate_response(prompt):
-    response = model.generate_content(prompt)
-    return response.text
+    except Exception as e:
+        return f"LLM ERROR: {str(e)}"
